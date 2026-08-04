@@ -11,6 +11,20 @@ services:
     networks:
       - erp-network
 
+  ollama:
+    image: alpine/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - erp-network
+
+volumes:
+  ollama_data:
+
 networks:
   erp-network:
     external: true
