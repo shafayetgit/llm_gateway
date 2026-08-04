@@ -69,4 +69,4 @@ async def client() -> AsyncGenerator[AsyncClient, None]:
 @pytest.fixture
 def admin_headers() -> dict[str, str]:
     """Admin secret header fixture."""
-    return {"X-Admin-Secret": settings.secret_key}
+    return {"X-Secret": settings.secret_key}

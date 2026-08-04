@@ -11,7 +11,7 @@ This gateway acts as a secure reverse proxy between internal applications (LMS, 
 - **OpenAI Specification Compatibility**: Native support for `/v1/chat/completions`, `/v1/embeddings`, and `/v1/models` endpoints.
 - **Secure API Key Management**:
   - SHA-256 hashed storage (raw keys are generated once with prefix `gw_live_...` and never saved in plain text).
-  - Protected Administrative CRUD API for key creation and revocation via `X-Admin-Secret`.
+  - Protected Administrative CRUD API for key creation and revocation via `X-Secret`.
 - **Pluggable Model Router**:
   - Centralized routing dispatcher resolving requested models to appropriate inference providers (e.g. Ollama).
 - **Asynchronous Architecture**:
@@ -118,12 +118,12 @@ uv run pytest
 
 ### 1. Generating a Client API Key (Admin Endpoint)
 
-Use your `SECRET_KEY` in the `X-Admin-Secret` header to generate a key for an internal service:
+Use your `SECRET_KEY` in the `X-Secret` header to generate a key for an internal service:
 
 ```bash
 curl -X POST "http://127.0.0.1:8000/api/v1/api-keys" \
   -H "Content-Type: application/json" \
-  -H "X-Admin-Secret: your-super-secret-admin-key" \
+  -H "X-Secret: your-super-secret-admin-key" \
   -d '{
     "name": "LMS Backend Production",
     "app_name": "lms"

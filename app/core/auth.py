@@ -11,7 +11,7 @@ from app.core.security import hash_api_key
 from app.models.api_key import ApiKey
 
 bearer_scheme = HTTPBearer(auto_error=False)
-admin_header_scheme = APIKeyHeader(name="X-Admin-Secret", auto_error=False)
+secret_header_scheme = APIKeyHeader(name="X-Secret", auto_error=False)
 
 
 async def verify_api_key(
@@ -47,12 +47,12 @@ async def verify_api_key(
 
 
 async def verify_admin_secret(
-    secret: Annotated[str | None, Security(admin_header_scheme)],
+    secret: Annotated[str | None, Security(secret_header_scheme)],
 ) -> str:
-    """Validates admin secret key for administrative endpoints."""
+    """Validates secret key for administrative endpoints."""
     if not secret or secret != settings.secret_key:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Invalid or missing Admin Secret",
+            detail="Invalid or missing Secret",
         )
     return secret

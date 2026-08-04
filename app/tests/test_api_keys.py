@@ -10,7 +10,7 @@ async def test_admin_api_key_lifecycle(
     bad_res = await client.post(
         "/api/v1/api-keys",
         json={"name": "LMS Backend", "app_name": "lms"},
-        headers={"X-Admin-Secret": "invalid_secret"},
+        headers={"X-Secret": "invalid_secret"},
     )
     assert bad_res.status_code == 403
 
