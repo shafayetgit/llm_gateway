@@ -1,6 +1,8 @@
+from collections.abc import AsyncGenerator
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
+from fastapi.responses import StreamingResponse
 
 from app.core import model_router, verify_api_key
 from app.models.api_key import ApiKey
@@ -26,5 +28,8 @@ async def create_chat_completion(
         max_tokens=payload.max_tokens,
         stream=payload.stream,
     )
+
+    if isinstance(response, AsyncGenerator):
+        return StreamingResponse(response, media_type="text/event-stream")
 
     return response
