@@ -1,0 +1,44 @@
+################################################
+# BUILDER - Stage 1
+################################################
+FROM python:3.14-slim-bookworm AS builder
+
+# Copy UV binary from official image
+COPY --from=ghcr.io/astral-sh/uv:0.11.6 /uv /uvx /bin/
+
+WORKDIR /app
+
+# UV Docker optimizations
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
+ENV UV_PYTHON_DOWNLOADS=0
+
+# Install dependencies
+COPY pyproject.toml uv.lock ./
+RUN uv sync --locked --no-install-project --no-dev
+
+# Copy app code and install project
+COPY . ./
+RUN uv sync --locked --no-dev
+
+################################################
+# PRODUCTION - Stage 2
+################################################
+FROM python:3.14-slim-bookworm
+
+WORKDIR /app
+
+# Run as non-root user for security
+RUN useradd -m -g root appuser && chown -R appuser:root /app
+USER appuser
+
+# Copy app and dependencies from builder stage
+COPY --from=builder --chown=appuser:root /app /app
+RUN chmod +x /app/start.prod.sh
+
+ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONUNBUFFERED=1
+ENV PORT=8002
+
+# Run entrypoint script which handles migrations and seeding
+CMD ["./start.prod.sh"]

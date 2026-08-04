@@ -1,3 +1,4 @@
+import hmac
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, Security, status
@@ -49,8 +50,8 @@ async def verify_api_key(
 async def verify_admin_secret(
     secret: Annotated[str | None, Security(secret_header_scheme)],
 ) -> str:
-    """Validates secret key for administrative endpoints."""
-    if not secret or secret != settings.secret_key:
+    """Validates secret key for administrative endpoints using constant-time comparison."""
+    if not secret or not hmac.compare_digest(secret, settings.secret_key):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid or missing Secret",

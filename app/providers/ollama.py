@@ -12,6 +12,13 @@ from .base import BaseLLMProvider
 class OllamaProvider(BaseLLMProvider):
     def __init__(self, base_url: str | None = None):
         self.base_url = (base_url or settings.ollama_base_url).rstrip("/")
+        self._client: httpx.AsyncClient | None = None
+
+    @property
+    def client(self) -> httpx.AsyncClient:
+        if self._client is None or self._client.is_closed:
+            self._client = httpx.AsyncClient(timeout=180.0)
+        return self._client
 
     async def chat_completion(
         self,
@@ -33,21 +40,28 @@ class OllamaProvider(BaseLLMProvider):
         if max_tokens:
             payload["max_tokens"] = max_tokens
 
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            try:
-                response = await client.post(url, json=payload)
-                response.raise_for_status()
-                return response.json()
-            except httpx.HTTPStatusError as exc:
-                raise HTTPException(
-                    status_code=exc.response.status_code,
-                    detail=f"Ollama provider error: {exc.response.text}",
-                )
-            except httpx.RequestError as exc:
-                raise HTTPException(
-                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                    detail=f"Unable to reach Ollama server at {self.base_url}: {exc}",
-                )
+        try:
+            if stream:
+                async def stream_generator() -> AsyncGenerator[str]:
+                    async with self.client.stream("POST", url, json=payload) as response:
+                        response.raise_for_status()
+                        async for chunk in response.aiter_text():
+                            yield chunk
+                return stream_generator()
+
+            response = await self.client.post(url, json=payload)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as exc:
+            raise HTTPException(
+                status_code=exc.response.status_code,
+                detail=f"Ollama provider error: {exc.response.text}",
+            )
+        except httpx.RequestError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=f"Unable to reach Ollama server at {self.base_url}: {exc}",
+            )
 
     async def create_embeddings(
         self,
@@ -62,18 +76,17 @@ class OllamaProvider(BaseLLMProvider):
             "input": input_texts,
         }
 
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            try:
-                response = await client.post(url, json=payload)
-                response.raise_for_status()
-                return response.json()
-            except httpx.HTTPStatusError as exc:
-                raise HTTPException(
-                    status_code=exc.response.status_code,
-                    detail=f"Ollama embedding error: {exc.response.text}",
-                )
-            except httpx.RequestError as exc:
-                raise HTTPException(
-                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                    detail=f"Unable to reach Ollama server at {self.base_url}: {exc}",
-                )
+        try:
+            response = await self.client.post(url, json=payload)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as exc:
+            raise HTTPException(
+                status_code=exc.response.status_code,
+                detail=f"Ollama embedding error: {exc.response.text}",
+            )
+        except httpx.RequestError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=f"Unable to reach Ollama server at {self.base_url}: {exc}",
+            )
