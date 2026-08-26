@@ -1,0 +1,53 @@
+name: CI Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: shafayet
+          POSTGRES_PASSWORD: admin
+          POSTGRES_DB: llm_gateway_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run Tests
+        env:
+          APP_NAME: "LLM API Gateway Test"
+          APP_ENV: "testing"
+          DEBUG: "True"
+          SECRET_KEY: "ci-secret-key-test"
+          DATABASE_URL: "postgresql+asyncpg://shafayet:admin@localhost:5432/llm_gateway_test"
+          TEST_DATABASE_URL: "postgresql+asyncpg://shafayet:admin@localhost:5432/llm_gateway_test"
+          OLLAMA_BASE_URL: "http://localhost:11434"
+        run: uv run pytest
