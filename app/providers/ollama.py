@@ -39,6 +39,10 @@ class OllamaProvider(BaseLLMProvider):
         }
         if max_tokens:
             payload["max_tokens"] = max_tokens
+        if kwargs.get("tools"):
+            payload["tools"] = kwargs["tools"]
+        if kwargs.get("tool_choice"):
+            payload["tool_choice"] = kwargs["tool_choice"]
 
         try:
             if stream:
@@ -71,10 +75,14 @@ class OllamaProvider(BaseLLMProvider):
     ) -> dict[str, Any]:
         url = f"{self.base_url}/v1/embeddings"
 
-        payload = {
+        payload: dict[str, Any] = {
             "model": model,
             "input": input_texts,
         }
+        if kwargs.get("dimensions"):
+            payload["dimensions"] = kwargs["dimensions"]
+        if kwargs.get("encoding_format"):
+            payload["encoding_format"] = kwargs["encoding_format"]
 
         try:
             response = await self.client.post(url, json=payload)
