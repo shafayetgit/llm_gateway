@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "LLM API Gateway"
-    app_env: str
+    app_env: str = "production"
     debug: bool = False
 
     @field_validator("debug", mode="before")
@@ -21,13 +21,13 @@ class Settings(BaseSettings):
 
     # Database
     database_url: str
-    test_database_url: str
+    test_database_url: str = ""
 
     # Security
     secret_key: str
 
     # Ollama Provider
-    ollama_base_url: str
+    ollama_base_url: str = "http://localhost:11434"
 
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore"
