@@ -1,7 +1,7 @@
 from functools import lru_cache
 
 from typing import Any
-from pydantic import field_validator
+from pydantic import computed_field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -21,7 +21,6 @@ class Settings(BaseSettings):
 
     # Database
     database_url: str
-    test_database_url: str = ""
 
     # Security
     secret_key: str
@@ -32,6 +31,13 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )
+
+    @computed_field
+    @property
+    def test_database_url(self) -> str:
+        if "/llm_gateway" in self.database_url:
+            return self.database_url.replace("/llm_gateway", "/llm_gateway_test")
+        return f"{self.database_url}_test"
 
 
 @lru_cache
