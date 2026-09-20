@@ -27,6 +27,8 @@ async def create_chat_completion(
         temperature=payload.temperature or 0.7,
         max_tokens=payload.max_tokens,
         stream=payload.stream,
+        tools=payload.tools,
+        tool_choice=payload.tool_choice,
     )
 
     if isinstance(response, AsyncGenerator):
