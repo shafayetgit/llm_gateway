@@ -8,8 +8,8 @@ from app.models.model_config import ModelConfig
 
 DEFAULT_MODELS = [
     # Ollama Models
-    {"name": "smollm2:135m", "provider": "ollama"},
-    {"name": "gemma4", "provider": "ollama"},
+    {"name": "bge-m3:567m", "provider": "ollama"},
+    {"name": "gemma4:31b-cloud", "provider": "ollama"},
     {"name": "llama3", "provider": "ollama"},
     # Google Gemini Models
     {"name": "gemini-3.8-flash", "provider": "google"},
