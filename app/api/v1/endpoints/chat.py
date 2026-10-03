@@ -18,7 +18,7 @@ async def create_chat_completion(
 ):
 
     # 1. Resolve provider for requested model
-    provider = model_router.get_provider(payload.model)
+    provider = await model_router.get_provider(payload.model)
 
     # 2. Forward request to provider
     response = await provider.chat_completion(
