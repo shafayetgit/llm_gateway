@@ -15,7 +15,7 @@ async def create_embeddings(
     api_key: Annotated[ApiKey, Depends(verify_api_key)],
 ):
     # 1. Resolve provider for requested model
-    provider = model_router.get_provider(payload.model)
+    provider = await model_router.get_provider(payload.model)
 
     # 2. Forward request to provider
     response = await provider.create_embeddings(
