@@ -15,7 +15,10 @@ class GoogleProvider(BaseLLMProvider):
     @property
     def client(self) -> httpx.AsyncClient:
         if self._client is None or self._client.is_closed:
-            headers = {"Authorization": f"Bearer {self.api_key}"} if self.api_key else {}
+            headers = {}
+            if self.api_key:
+                headers["Authorization"] = f"Bearer {self.api_key}"
+                headers["X-goog-api-key"] = self.api_key
             self._client = httpx.AsyncClient(headers=headers, timeout=120.0)
         return self._client
 
