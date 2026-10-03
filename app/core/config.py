@@ -1,13 +1,23 @@
 from functools import lru_cache
 
-from pydantic import computed_field
+from typing import Any
+from pydantic import computed_field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     app_name: str = "LLM API Gateway"
-    app_env: str
+    app_env: str = "production"
     debug: bool = False
+
+    @field_validator("debug", mode="before")
+    @classmethod
+    def parse_debug(cls, v: Any) -> bool:
+        if isinstance(v, bool):
+            return v
+        if isinstance(v, str):
+            return v.lower() in ("true", "1", "yes", "on", "dev", "development")
+        return bool(v)
 
     # Database
     database_url: str
@@ -16,7 +26,7 @@ class Settings(BaseSettings):
     secret_key: str
 
     # Ollama Provider
-    ollama_base_url: str
+    ollama_base_url: str = "http://localhost:11434"
 
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore"

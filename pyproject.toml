@@ -1,9 +1,13 @@
 [project]
 name = "llm-gateway"
 version = "0.1.0"
-description = "Add your description here"
+description = "High-performance, private, OpenAI-compatible LLM API Gateway built with FastAPI and PostgreSQL."
 readme = "README.md"
 requires-python = ">=3.14"
+license = { text = "MIT" }
+authors = [
+    { name = "Shafayet" }
+]
 dependencies = [
     "alembic>=1.18.5",
     "asyncpg>=0.31.0",
