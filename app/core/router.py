@@ -1,7 +1,9 @@
 import time
+
 from fastapi import HTTPException, status
 from sqlalchemy import select
 
+from app.providers.sentence_transformer import SentenceTransformerProvider
 from app.core.db import AsyncSessionLocal
 from app.models.model_config import ModelConfig
 from app.providers.base import BaseLLMProvider
@@ -14,6 +16,7 @@ class ModelRouter:
         self.providers: dict[str, BaseLLMProvider] = {
             "ollama": OllamaProvider(),
             "google": GoogleProvider(),
+            "sentence_transformer": SentenceTransformerProvider(),
         }
         self.ttl = ttl_seconds
         # In-memory cache: model_name -> (provider_key, expiration_timestamp)

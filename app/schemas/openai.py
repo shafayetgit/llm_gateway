@@ -21,9 +21,25 @@ class ChatCompletionRequest(BaseModel):
     tool_choice: str | dict[str, Any] | None = None
 
 
+class MultimodalEmbeddingInput(BaseModel):
+    text: str | None = None
+    image: str | list[str] | None = None  # Base64 data URI or HTTP(S) URL
+    # Future modalities:
+    # video: str | list[str] | None = None
+    # audio: str | list[str] | None = None
+
+
 class EmbeddingRequest(BaseModel):
     model: str
-    input: str | list[str] | list[int] | list[list[int]]
+    input: (
+        str
+        | list[str]
+        | list[int]
+        | list[list[int]]
+        | MultimodalEmbeddingInput
+        | list[MultimodalEmbeddingInput]
+    )
     encoding_format: str | None = None
     dimensions: int | None = None
+    prompt_name: str | None = None
     user: str | None = None

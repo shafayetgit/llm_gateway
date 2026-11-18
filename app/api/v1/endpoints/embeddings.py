@@ -23,6 +23,7 @@ async def create_embeddings(
         input_texts=payload.input,
         dimensions=payload.dimensions,
         encoding_format=payload.encoding_format,
+        prompt_name=payload.prompt_name,
     )
 
     return response

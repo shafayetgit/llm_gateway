@@ -12,6 +12,7 @@ This gateway acts as a secure reverse proxy between internal applications (LMS, 
 - **Multiple Inference Providers**:
   - **Ollama**: Local and self-hosted models (e.g. `smollm2:135m`, `llama3`).
   - **Google Gemini**: Cloud models via official OpenAI-compatible endpoints (e.g. `gemini-flash-latest`, `text-embedding-004`).
+  - **SentenceTransformers**: Local multimodal embeddings (e.g. `google/embeddinggemma-2`) supporting text, images, `prompt_name` task prefixes, and MRL dimension truncation (`128`–`768`).
 - **Dynamic Database Model Router**:
   - Models are dynamically registered and managed via the `model_configs` table in PostgreSQL.
   - High-performance in-memory TTL cache (60s) ensures near-instantaneous routing with zero database overhead on hot paths.
@@ -49,7 +50,7 @@ llm-gateway/
 │   ├── bootstrap/        # App startup modules (routes, docs, middlewares)
 │   ├── core/             # Core configurations, Auth, Security, & Dynamic Model Router
 │   ├── models/           # SQLAlchemy database entities (ApiKey, ModelConfig)
-│   ├── providers/        # Backend provider adapters (BaseLLMProvider, OllamaProvider, GoogleProvider)
+│   ├── providers/        # Backend provider adapters (BaseLLMProvider, OllamaProvider, GoogleProvider, SentenceTransformerProvider)
 │   ├── schemas/          # Pydantic validation schemas (ApiKey, OpenAI specs)
 │   ├── tests/            # Automated async pytest suite (PostgreSQL test DB)
 │   └── main.py           # Application entrypoint
@@ -223,13 +224,31 @@ curl -X POST "http://127.0.0.1:8000/api/v1/chat/completions" \
 
 ### 4. Embeddings (`/api/v1/embeddings`)
 
+#### Text Embeddings:
 ```bash
 curl -X POST "http://127.0.0.1:8000/api/v1/embeddings" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer gw_live_abc123secretkey..." \
   -d '{
-    "model": "text-embedding-004",
-    "input": "Text to embed for vector search"
+    "model": "google/embeddinggemma-2",
+    "input": "What causes the northern lights?",
+    "prompt_name": "SearchQuery",
+    "dimensions": 512
+  }'
+```
+
+#### Multimodal (Text + Image) Embeddings (`google/embeddinggemma-2`):
+```bash
+curl -X POST "http://127.0.0.1:8000/api/v1/embeddings" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer gw_live_abc123secretkey..." \
+  -d '{
+    "model": "google/embeddinggemma-2",
+    "input": {
+      "text": "A photo of a product: <|image|>",
+      "image": "data:image/png;base64,..."
+    },
+    "dimensions": 512
   }'
 ```
 

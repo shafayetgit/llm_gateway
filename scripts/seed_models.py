@@ -15,6 +15,8 @@ DEFAULT_MODELS = [
     {"name": "gemini-3.8-flash", "provider": "google"},
     {"name": "gemini-2.0-flash", "provider": "google"},
     {"name": "text-embedding-004", "provider": "google"},
+    # Local Multimodal Embedding Models
+    {"name": "google/embeddinggemma-2", "provider": "sentence_transformer"},
 ]
 
 
