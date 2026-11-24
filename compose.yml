@@ -10,20 +10,20 @@ services:
     #   - "127.0.0.1:8002:8002"
     networks:
       - worm-network
-  # enable the following service if you want to run ollama in a container
-  # ollama:
-  #   image: alpine/ollama:latest
-  #   container_name: ollama
-  #   restart: unless-stopped
-  #   # ports:
-  #   #   - "127.0.0.1:11434:11434"
-  #   volumes:
-  #     - ollama_data:/root/.ollama
-  #   networks:
-  #     - worm-network
+  
+  ollama:
+    image: alpine/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    # ports:
+    #   - "127.0.0.1:11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - worm-network
 
-# volumes:
-#   ollama_data:
+volumes:
+  ollama_data:
 
 networks:
   worm-network:
