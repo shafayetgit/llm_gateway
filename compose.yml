@@ -9,7 +9,7 @@ services:
     # ports:
     #   - "127.0.0.1:8002:8002"
     networks:
-      - erp-network
+      - worm-network
   # enable the following service if you want to run ollama in a container
   # ollama:
   #   image: alpine/ollama:latest
@@ -20,11 +20,11 @@ services:
   #   volumes:
   #     - ollama_data:/root/.ollama
   #   networks:
-  #     - erp-network
+  #     - worm-network
 
 # volumes:
 #   ollama_data:
 
 networks:
-  erp-network:
+  worm-network:
     external: true
