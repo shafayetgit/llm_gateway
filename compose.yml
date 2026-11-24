@@ -10,7 +10,7 @@ services:
     #   - "127.0.0.1:8002:8002"
     networks:
       - erp-network
-
+  # enable the following service if you want to run ollama in a container
   # ollama:
   #   image: alpine/ollama:latest
   #   container_name: ollama
@@ -22,8 +22,8 @@ services:
   #   networks:
   #     - erp-network
 
-volumes:
-  ollama_data:
+# volumes:
+#   ollama_data:
 
 networks:
   erp-network:
