@@ -70,9 +70,16 @@ class OllamaProvider(BaseLLMProvider):
     async def create_embeddings(
         self,
         model: str,
-        input_texts: list[str] | str,
+        input_texts: Any,
         **kwargs: Any,
     ) -> dict[str, Any]:
+        items = input_texts if isinstance(input_texts, list) else [input_texts]
+        if any(hasattr(item, "model_dump") or isinstance(item, dict) for item in items):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Model '{model}' via Ollama does not support structured multimodal embedding inputs.",
+            )
+
         url = f"{self.base_url}/v1/embeddings"
 
         payload: dict[str, Any] = {

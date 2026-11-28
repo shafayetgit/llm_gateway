@@ -9,8 +9,8 @@ services:
     # ports:
     #   - "127.0.0.1:8002:8002"
     networks:
-      - erp-network
-
+      - worm-network
+  
   ollama:
     image: alpine/ollama:latest
     container_name: ollama
@@ -20,11 +20,11 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     networks:
-      - erp-network
+      - worm-network
 
 volumes:
   ollama_data:
 
 networks:
-  erp-network:
+  worm-network:
     external: true

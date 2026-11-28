@@ -12,7 +12,11 @@ dependencies = [
     "alembic>=1.18.5",
     "asyncpg>=0.31.0",
     "fastapi[standard]>=0.141.1",
+    "pillow>=13.0.0",
+    "sentence-transformers>=6.3.0",
     "sqlalchemy>=2.0.51",
+    "torch>=2.15.0",
+    "torchvision>=0.29.2",
 ]
 
 [dependency-groups]

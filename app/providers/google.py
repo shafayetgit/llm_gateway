@@ -37,6 +37,22 @@ class GoogleProvider(BaseLLMProvider):
                 detail="Google API key is not configured.",
             )
 
+        # Ensure role="tool" messages always have `name` for Google's OpenAI-compat layer
+        tool_id_to_name: dict[str, str] = {}
+        for msg in messages:
+            if msg.get("role") == "assistant" and msg.get("tool_calls"):
+                for tc in msg["tool_calls"]:
+                    tc_id = tc.get("id")
+                    fn_name = tc.get("function", {}).get("name")
+                    if tc_id and fn_name:
+                        tool_id_to_name[tc_id] = fn_name
+            elif msg.get("role") == "tool":
+                tc_id = msg.get("tool_call_id")
+                if not msg.get("name") and tc_id and tc_id in tool_id_to_name:
+                    msg["name"] = tool_id_to_name[tc_id]
+                if msg.get("content") is None:
+                    msg["content"] = ""
+
         url = f"{self.base_url}/chat/completions"
         payload = {
             "model": model,
@@ -71,9 +87,22 @@ class GoogleProvider(BaseLLMProvider):
     async def create_embeddings(
         self,
         model: str,
-        input_texts: list[str] | str,
+        input_texts: Any,
         **kwargs: Any,
     ) -> dict[str, Any]:
+        if not self.api_key:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Google API key is not configured.",
+            )
+
+        items = input_texts if isinstance(input_texts, list) else [input_texts]
+        if any(hasattr(item, "model_dump") or isinstance(item, dict) for item in items):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Model '{model}' via Google OpenAI-compatible endpoint does not support structured multimodal embedding inputs.",
+            )
+
         url = f"{self.base_url}/embeddings"
         payload = {"model": model, "input": input_texts}
         if kwargs.get("dimensions"):
