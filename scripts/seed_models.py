@@ -1,5 +1,4 @@
 import asyncio
-from click import Command
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 
@@ -10,11 +9,16 @@ DEFAULT_MODELS = [
     # Ollama Models
     {"name": "bge-m3:567m", "provider": "ollama"},
     {"name": "gemma4:31b-cloud", "provider": "ollama"},
+    {"name": "gemma4:e2b", "provider": "ollama"},
+    {"name": "gemma4:e2b-it-qat", "provider": "ollama"},
+    {"name": "lfm3-vl:latest", "provider": "ollama"},
     {"name": "llama3", "provider": "ollama"},
     # Google Gemini Models
     {"name": "gemini-3.8-flash", "provider": "google"},
-    {"name": "gemini-2.0-flash", "provider": "google"},
+    {"name": "gemini-4-hydrogen", "provider": "google"},
     {"name": "text-embedding-004", "provider": "google"},
+    # Local Multimodal Embedding Models
+    {"name": "google/embeddinggemma-2", "provider": "sentence_transformer"},
 ]
 
 

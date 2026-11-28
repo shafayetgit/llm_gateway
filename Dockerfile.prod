@@ -38,7 +38,7 @@ RUN chmod +x /app/start.prod.sh
 
 ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONUNBUFFERED=1
-ENV PORT=8002
+ENV PORT=8003
 
 # Run entrypoint script which handles migrations and seeding
 CMD ["./start.prod.sh"]
